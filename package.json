@@ -1,0 +1,38 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Plug service api",
+  "main": "server.js",
+  "author": "Apus Industries Limited",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon server",
+    "start": "prisma db push --accept-data-loss && pm2 start server.js --name Plug && pm2 log Plug",
+    "db-update": "prisma db push"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "argon2": "^0.41.1",
+    "compression": "^1.7.5",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "crypto-random-string": "^3.*",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "figlet": "^1.8.0",
+    "jsonwebtoken": "^9.0.2",
+    "juice": "^11.0.0",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.16",
+    "pm2": "^5.4.2",
+    "prisma": "^5.22.0",
+    "vhost": "^3.0.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "nodemon": "^3.1.7",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14"
+  }
+}

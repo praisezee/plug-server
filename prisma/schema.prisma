@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RegistrationStatus{
+  REGISTERED
+  NOTREGISTERED
+}
+
+enum Gender{
+  MALE
+  FEMALE
+}
+
+enum IdType{
+  PASSPORT
+  NIN
+  VOTER_CARD
+  DRIVER_LICENCE
+}
+
+
+model User{
+  id String @unique @default(uuid())
+  name String
+  phone_number  String
+  email String @unique
+  status RegistrationStatus
+  password String
+  terms Boolean
+  otp Int?
+  dp String?
+  banner String?
+  hasPaid Boolean @default(false)
+  isVerified Boolean @default(false)
+  refresh_token String[]
+  reset_password_token String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  business BusinessKyc? 
+  personal PersonalKyc?
+  domain Domain?
+}
+
+model Domain{
+  id String @unique @default(uuid())
+  userId String @unique
+  url String @unique
+  user User @relation(fields: [userId],references: [id])
+}
+
+model PersonalKyc{
+  id String @unique @default(uuid())
+  userId String @unique
+  firstname String
+  lastname String
+  gender Gender
+  dob String
+  bvn Int
+  phone_number String
+  address String
+  state String
+  city String
+  id_type IdType
+  id_number String
+  id_exp String
+  proof_id String
+  proof_address String
+  other_docs String[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [userId],references: [id])
+}
+
+model BusinessKyc{
+  id String @unique @default(uuid())
+  userId String @unique
+  name String
+  reg_type String
+  reg_date String
+  industry String
+  reg_address String
+  biz_address String
+  biz_city String
+  biz_state String
+  reg_city String
+  reg_state String
+  reg_number String
+  tax_number String
+  biz_cert String
+  mermat_doc String
+  status_report String
+  principal_id String
+  principal_image String
+  id_type IdType
+  proof_address String
+  other_docs String[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [userId],references: [id])
+  directors Directors[]
+}
+
+model Directors{
+  id String @unique @default(uuid())
+  businessId String @unique
+  firstname String
+  lastname String
+  gender Gender
+  dob String
+  bvn Int
+  phone_number String
+  address String
+  state String
+  city String
+  owner_share Int
+  role String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  business BusinessKyc @relation(fields: [businessId],references: [id])
+}
+
