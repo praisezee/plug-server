@@ -30,6 +30,36 @@ enum IdType{
   DRIVER_LICENCE
 }
 
+enum CustomerType{
+  INDIVIDUAL
+  BUSINESS
+}
+
+enum DiscountType{
+  FLAT
+  PERCENTAGE
+}
+
+enum VariationType{
+  COLOR
+  SIZE
+  OTHERS
+}
+
+enum InvoiceStatus{
+  PAID
+  UNPAID
+  OVERDUE
+  PARTIAL
+}
+
+enum OrderStatus{
+  PENDING
+  COMPLETED
+  DISPATCHED
+  RETURNED
+}
+
 
 model User{
   id String @unique @default(uuid())
@@ -44,6 +74,7 @@ model User{
   banner String?
   hasPaid Boolean @default(false)
   isVerified Boolean @default(false)
+  isApproved Boolean @default(false)
   refresh_token String[]
   reset_password_token String?
   created_at DateTime @default(now())
@@ -52,13 +83,18 @@ model User{
   business BusinessKyc? 
   personal PersonalKyc?
   domain Domain?
+  customers Customer[]
+  items Item[]
+  groups Group[]
 }
 
 model Domain{
   id String @unique @default(uuid())
   userId String @unique
   url String @unique
-  user User @relation(fields: [userId],references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 }
 
 model PersonalKyc{
@@ -71,6 +107,9 @@ model PersonalKyc{
   bvn Int
   phone_number String
   address String
+  biz_address String
+  biz_city String
+  biz_state String
   state String
   city String
   id_type IdType
@@ -82,7 +121,7 @@ model PersonalKyc{
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 }
 
 model BusinessKyc{
@@ -106,12 +145,13 @@ model BusinessKyc{
   principal_id String
   principal_image String
   id_type IdType
+  proof_id String
   proof_address String
   other_docs String[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
   directors Directors[]
 }
 
@@ -132,6 +172,95 @@ model Directors{
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  business BusinessKyc @relation(fields: [businessId],references: [id])
+  business BusinessKyc @relation(fields: [businessId],references: [id],onDelete: Cascade)
 }
 
+
+model Customer{
+  id String @unique @default(uuid())
+  userId String
+  type CustomerType
+  name String
+  biz_name String?
+  phone_number String
+  dispatch_location String?
+  email String?
+  address String?
+  landmark String?
+  city String?
+  state String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  invoices Invoice[]
+}
+
+
+model Item {
+  id String @unique @default(uuid())
+  userId String
+  title String
+  category String
+  description String
+  group String @default("all")
+  price Float
+  quantity Int
+  image String[]
+  hasDiscount Boolean @default(false)
+  discount Float?
+  discountType DiscountType?
+  hasVariation Boolean @default(false)
+  unit String
+  isPublic Boolean @default(true)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  variations Variation[]
+
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  groups Group @relation(fields: [group],references: [name])
+}
+
+model Group{
+  id String @unique @default(uuid())
+  name String @unique
+  userId String
+  items Item[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+model Variation {
+  id String @unique @default(uuid())
+  itemId String
+  type VariationType
+  variant String
+  price Float
+  quantity Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id String @unique @default(uuid())
+  invoice_number String
+  due_date String
+  due_day Int
+  others String
+  customerId String
+  items String[]
+  total Float
+  discount Float @default(0)
+  tax Float @default(0)
+  status InvoiceStatus @default(UNPAID)
+  isFullfiled Boolean @default(false)
+  note String?
+  signature String
+  order_status OrderStatus @default(PENDING)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+}

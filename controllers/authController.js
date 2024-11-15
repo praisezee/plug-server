@@ -20,10 +20,12 @@ const createUser = async ( req, res ) =>
     const eistingDomain = await prisma.domain.findUnique( { where: { url: `${ sanitizeDomain }.${ process.env.URL }` } } );
     if ( eistingDomain ) return sendErrorResponse( res, 400, "Domain already exist", { business_name: name } );
 
-    const code = randomString({ length: 6, type: "numeric" });
+    const code = randomString( { length: 6, type: "numeric" } );
+    const date = new Date()
+    const year = date.getFullYear()
 
-    const hashedPassword = argon.hash( password );
-    const htmlContent = loadTemplate("Registration",{code})
+    const hashedPassword = await argon.hash( password );
+    const htmlContent = loadTemplate("Registration",{code,year})
 
     const user = await prisma.user.create( {
       data: {
@@ -33,6 +35,7 @@ const createUser = async ( req, res ) =>
         password: hashedPassword,
         status: status.toUpperCase(),
         terms,
+        otp:parseInt(code),
         domain: {
           create: {
             url: `${ sanitizeDomain }.${ process.env.URL }`,
@@ -44,7 +47,8 @@ const createUser = async ( req, res ) =>
 
     await sendMail(email,"Email Verification",htmlContent)
     return sendSuccessResponse( res, 201, "User registration was successful", { user } );
-  } catch (error) {
+  } catch ( error ) {
+    console.error(error);
     if ( error instanceof Prisma.PrismaClientKnownRequestError ) {
       if ( error.code === "P2002" ) return sendErrorResponse( res, 409, "Email already exist", { email } );
     }

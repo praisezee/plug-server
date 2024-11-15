@@ -9,7 +9,7 @@ const credentials = require( "./middleware/credentials" );
 const corsOption = require( "./config/corsOption" );
 const { verifyJwt } = require( './middleware/auth' );
 const cron = require('node-cron');
-const { uploadDocs } = require( "./middleware/fileStorage" );
+const { uploadDocs, uploadProduct } = require( "./middleware/fileStorage" );
 
 const prisma = new PrismaClient()
 const PORT = process.env.PORT || 3500;
@@ -35,9 +35,17 @@ app.get( '/', (req,res) =>
   res.status(301).redirect( process.env.URL );
 } )
 
+app.use( '/domain', require( "./routes/domain" ) );
 app.use( '/auth', require( "./routes/auth" ) );
+app.use( '/verify', require( './routes/verify' ) );
 app.use( "/refresh", require( './routes/refresh' ) );
 app.use( '/kyc', uploadDocs, require( './routes/kyc' ) );
+
+
+
+app.use( verifyJwt );
+app.use( '/customers', require( './routes/customer' ) );
+app.use( '/items', uploadProduct, require( "./routes/item" ) );
 
 
 

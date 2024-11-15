@@ -1,10 +1,10 @@
 const express = require( "express" );
-const { createUser } = require( "../controllers/authController" );
+const { personalKyc, businessKyc } = require( "../controllers/kycController" );
 const router = express.Router();
 
 
-router.post( "/personal", createUser );
-router.post( "/business", createUser );
+router.post( "/personal", personalKyc );
+router.post( "/business", businessKyc );
 
 
 module.exports = router;
