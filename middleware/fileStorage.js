@@ -10,7 +10,7 @@ const docStorage = multer.diskStorage( {
 } );
 
 const profileStorage = multer.diskStorage( {
-  destination: "public/vendor",
+  destination: "public/vendors",
   filename: ( req, file, cb ) =>
   {
     const uniqueSuffix = Date.now() + "-" + Math.round( Math.random() * 1e9 );
@@ -20,6 +20,15 @@ const profileStorage = multer.diskStorage( {
 
 const itemsStorage = multer.diskStorage( {
   destination: "public/images",
+  filename: ( req, file, cb ) =>
+  {
+    const uniqueSuffix = Date.now() + "-" + Math.round( Math.random() * 1e9 );
+    cb( null, file.fieldname + '-' + uniqueSuffix + file.originalname );
+  }
+} );
+
+const invoiceStorage = multer.diskStorage( {
+  destination: "public/invoices",
   filename: ( req, file, cb ) =>
   {
     const uniqueSuffix = Date.now() + "-" + Math.round( Math.random() * 1e9 );
@@ -64,6 +73,12 @@ const uploadProfile = multer( {
   fileFilter
 } );
 
+const uploadSig = multer( {
+  storage: invoiceStorage,
+  limits: { fileSize: 1024 * 1024 * 5 },
+  fileFilter
+})
+
 const uploadProduct = multer( {
   storage: itemsStorage,
   limits: { fileSize: 1024 * 1024 * 5 }, // 5MB limit
@@ -84,5 +99,6 @@ module.exports = {
     { name: "dp", maxCount: 1 },
     {name:"banner",maxCount:1}
   ] ),
-  uploadProduct: uploadProduct.array("items",5)
+  uploadProduct: uploadProduct.array( "items", 5 ),
+  uploadSig: uploadSig.single("signature")
 }

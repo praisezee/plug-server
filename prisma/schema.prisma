@@ -86,6 +86,7 @@ model User{
   customers Customer[]
   items Item[]
   groups Group[]
+  invoices Invoice[]
 }
 
 model Domain{
@@ -245,22 +246,40 @@ model Variation {
 
 model Invoice {
   id String @unique @default(uuid())
-  invoice_number String
+  invoice_number String @unique
+  userId String
   due_date String
   due_day Int
-  others String
+  others String?
   customerId String
-  items String[]
   total Float
   discount Float @default(0)
   tax Float @default(0)
   status InvoiceStatus @default(UNPAID)
   isFullfiled Boolean @default(false)
   note String?
-  signature String
+  signature String?
   order_status OrderStatus @default(PENDING)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
+
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items InvoiceItem[]
+}
+
+
+model InvoiceItem{
+  id String @unique @default(uuid())
+  invoiceId String
+  itemId String
+  quantity Int
+  price Float
+  discount Float @default(0)
+  tax Float @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  invoice Invoice @relation(fields: [invoiceId],references: [id])
 }
