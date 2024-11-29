@@ -75,6 +75,7 @@ model User{
   hasPaid Boolean @default(false)
   isVerified Boolean @default(false)
   isApproved Boolean @default(false)
+  description String?
   refresh_token String[]
   reset_password_token String?
   created_at DateTime @default(now())
@@ -105,7 +106,7 @@ model PersonalKyc{
   lastname String
   gender Gender
   dob String
-  bvn Int
+  bvn String
   phone_number String
   address String
   biz_address String
@@ -118,6 +119,7 @@ model PersonalKyc{
   id_exp String
   proof_id String
   proof_address String
+  principal_image String
   other_docs String[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -143,7 +145,6 @@ model BusinessKyc{
   biz_cert String
   mermat_doc String
   status_report String
-  principal_id String
   principal_image String
   id_type IdType
   proof_id String
@@ -163,8 +164,6 @@ model Directors{
   lastname String
   gender Gender
   dob String
-  bvn Int
-  phone_number String
   address String
   state String
   city String
@@ -274,6 +273,9 @@ model InvoiceItem{
   id String @unique @default(uuid())
   invoiceId String
   itemId String
+  name  String
+  description String
+  image String
   quantity Int
   price Float
   discount Float @default(0)
@@ -281,5 +283,5 @@ model InvoiceItem{
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  invoice Invoice @relation(fields: [invoiceId],references: [id])
+  invoice Invoice @relation(fields: [invoiceId],references: [id],onDelete: Cascade)
 }

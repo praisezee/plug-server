@@ -18,7 +18,7 @@ const createUser = async ( req, res ) =>
   const sanitizeDomain = sanitizeSubdomain( name );
   try {
     const eistingDomain = await prisma.domain.findUnique( { where: { url: `${ sanitizeDomain }.${ process.env.URL }` } } );
-    if ( eistingDomain ) return sendErrorResponse( res, 400, "Domain already exist", { business_name: name } );
+    if ( eistingDomain ) return sendErrorResponse( res, 401, "Domain already exist", { business_name: name } );
 
     const code = randomString( { length: 6, type: "numeric" } );
     const date = new Date()
@@ -100,6 +100,7 @@ const loginUser = async ( req, res ) =>
     delete user.otp;
     delete user.refresh_token;
     delete user.reset_password_token;
+    delete user.terms;
 
     res.cookies( "refreshToken", refreshToken, {
       httpOnly: true,

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "PersonalKyc" ALTER COLUMN "bvn" SET DATA TYPE TEXT;

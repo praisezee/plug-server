@@ -6,9 +6,9 @@ const prisma = new PrismaClient()
 
 const businessKyc = async ( req, res ) =>
 {
-  const { name, reg_type, reg_date, industry, reg_address, biz_address, biz_city, biz_state, reg_city,reg_state, reg_number, tax_number,id_type,email,directors,principal_id } = req.body;
+  const { name, reg_type, reg_date, industry, reg_address, biz_address, biz_city, biz_state, reg_city,reg_state, reg_number, tax_number,id_type,email,directors } = req.body;
   const { proof_id, biz_cert, mermat, status, principal_image, proof_address, others } = req.files;
-  if ( !name || !reg_type || !reg_date || !industry || !reg_address | !biz_address || !biz_city || !biz_state || !reg_city || !reg_state || !reg_number || !tax_number || !id_type || !email || !proof_address || !proof_id || !biz_cert || !mermat || !status || !principal_image|| !principal_id || directors.length<1 ) return sendErrorResponse( res, 400, "Please fill all required fields" );
+  if ( !name || !reg_type || !reg_date || !industry || !reg_address | !biz_address || !biz_city || !biz_state || !reg_city || !reg_state || !reg_number || !tax_number || !id_type || !email || !proof_address || !proof_id || !biz_cert || !mermat || !status || !principal_image || directors.length<1 ) return sendErrorResponse( res, 400, "Please fill all required fields" );
   try {
     const user = await prisma.user.findUniqueOrThrow( { where: { email } } );
     await prisma.businessKyc.create( {
@@ -29,7 +29,6 @@ const businessKyc = async ( req, res ) =>
         biz_cert: biz_cert[ 0 ].path,
         mermat_doc: mermat[ 0 ].path,
         status_report: status[ 0 ].path,
-        principal_id,
         principal_image: principal_image[ 0 ].path,
         id_type: id_type.toUpperCase(),
         proof_id: proof_id[ 0 ].path,
@@ -41,8 +40,6 @@ const businessKyc = async ( req, res ) =>
             lastname: director.lastname,
             gender: director.gender.toUpperCase(),
             dob: director.dob,
-            bvn: parseInt( director.bvn ),
-            phone_number: director.phone_number,
             address: director.address,
             state: director.state,
             city: director.city,
@@ -67,8 +64,8 @@ const businessKyc = async ( req, res ) =>
 const personalKyc = async ( req, res ) =>
 {
   const { firstname, lastname, gender, dob, phone_number, address, city, state, biz_address, biz_city, biz_state, id_type, id_number, id_exp, bvn,email } = req.body
-  const { proof_id,proof_address,others } = req.files;
-  if ( !firstname || !lastname || !gender || !dob || !phone_number || !address || !city || !state || !biz_address || !biz_city || !biz_state || !id_type || !id_number || !id_exp || !bvn || !proof_id || !proof_address || !email ) return sendErrorResponse( res, 400, "Please fill all fields" );
+  const { proof_id,proof_address,others,principal_image } = req.files;
+  if ( !firstname || !lastname || !gender || !dob || !phone_number || !address || !city || !state || !biz_address || !biz_city || !biz_state || !id_type || !id_number || !id_exp || !bvn || !proof_id || !proof_address || !email || !principal_image ) return sendErrorResponse( res, 400, "Please fill all fields" );
   try {
     const user = await prisma.user.findUniqueOrThrow( { where: { email } } );
 
@@ -79,7 +76,7 @@ const personalKyc = async ( req, res ) =>
         lastname,
         gender: gender.toUpperCase(),
         dob,
-        bvn: parseInt( bvn ),
+        bvn: bvn,
         phone_number,
         address,
         biz_address,
@@ -92,7 +89,8 @@ const personalKyc = async ( req, res ) =>
         id_exp,
         proof_id: proof_id[ 0 ].path,
         proof_address: proof_address[ 0 ].path,
-        other_docs: others.map(item=> item.path)
+        other_docs: others.map( item => item.path ),
+        principal_image:principal_image[0].path
       }
     } )
     

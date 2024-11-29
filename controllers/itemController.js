@@ -101,12 +101,12 @@ const getSingleItem = async ( req, res ) =>
       }
     } )
     return sendSuccessResponse(res,200,"Items Found",{items,count})
-  } catch (error) {
+  } catch ( error ) {
+    console.log( error )
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2025")
       return sendErrorResponse(res,404,"Item does not exist")
     }
-    console.log( error )
     return sendErrorResponse( res, 500, "Internal server error", error );
   }
 };

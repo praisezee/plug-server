@@ -46,6 +46,8 @@ app.use( '/kyc', uploadDocs, require( './routes/kyc' ) );
 app.use( verifyJwt );
 app.use( '/customers', require( './routes/customer' ) );
 app.use( '/items', uploadProduct, require( "./routes/item" ) );
+app.use( '/invoice', require( "./routes/invoice" ) );
+app.use( '/variation', require( "./routes/variation" ) );
 
 
 
