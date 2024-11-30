@@ -26,7 +26,8 @@ const createCustomer = async ( req, res ) =>
         landmark,
         city,
         state
-      }
+      },
+      include:{invoices:true}
     } );
     return sendSuccessResponse( res, 201, "Customer created successfully", { customer } );
   } catch ( error ) {
@@ -39,7 +40,7 @@ const getContacts = async ( req, res ) =>
 {
   try {
     const userId = res.user.id
-    const customers = await prisma.customer.findMany( { where: {userId} } );
+    const customers = await prisma.customer.findMany( { where: {userId},include:{invoices:true} } );
     return sendSuccessResponse( res, 200, "Found contact", { customers } );
   } catch (error) {
     console.log( error );
@@ -52,7 +53,7 @@ const getSingleContact = async ( req, res ) =>
   try {
     const userId = res.user.id
     const id = req.params;
-    const customer = await prisma.customer.findFirstOrThrow( { where: { id, userId } } );
+    const customer = await prisma.customer.findFirstOrThrow( { where: { id, userId },include:{invoices:true} } );
     return sendSuccessResponse( res, 200, "Found contact", { customer } );
   } catch (error) {
     console.log( error );
@@ -74,7 +75,7 @@ const editCustomer = async ( req, res ) =>
 
   if ( type.toUpperCase() === "BUSINESS" && !biz_name ) return sendErrorResponse( res, 400, "Business name is required for a business type", { name, type, biz_name, phone_number } );
   try {
-    const customer = await prisma.customer.findFirstOrThrow( { where: { id, userId } } );
+    const customer = await prisma.customer.findFirstOrThrow( { where: { id, userId },include:{invoices:true} } );
     customer.type = type.toUpperCase();
     customer.name = name;
     customer.biz_name = biz_name;

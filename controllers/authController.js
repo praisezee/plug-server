@@ -102,7 +102,7 @@ const loginUser = async ( req, res ) =>
     delete user.reset_password_token;
     delete user.terms;
 
-    res.cookies( "refreshToken", refreshToken, {
+    res.cookie( "refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: 'None',
