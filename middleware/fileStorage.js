@@ -81,7 +81,7 @@ const uploadSig = multer( {
 
 const uploadProduct = multer( {
   storage: itemsStorage,
-  limits: { fileSize: 1024 * 1024 * 5 }, // 5MB limit
+  limits: { fileSize: 1024 * 1024 * 20 }, // 5MB limit
   fileFilter
 } );
 
@@ -99,6 +99,8 @@ module.exports = {
     { name: "dp", maxCount: 1 },
     {name:"banner",maxCount:1}
   ] ),
-  uploadProduct: uploadProduct.array( "items", 5 ),
+  uploadProduct: uploadProduct.fields( [
+    { name: "items", maxCount: 5 }
+  ] ),
   uploadSig: uploadSig.single("signature")
 }

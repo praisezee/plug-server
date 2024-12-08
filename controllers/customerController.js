@@ -52,8 +52,13 @@ const getSingleContact = async ( req, res ) =>
 {
   try {
     const userId = res.user.id
-    const id = req.params;
-    const customer = await prisma.customer.findFirstOrThrow( { where: { id, userId },include:{invoices:true} } );
+    const {id} = req.params;
+    const customer = await prisma.customer.findFirstOrThrow( {
+      where: { id, userId },
+      include: {
+        invoices:true
+      }
+    })
     return sendSuccessResponse( res, 200, "Found contact", { customer } );
   } catch (error) {
     console.log( error );
@@ -67,7 +72,7 @@ const getSingleContact = async ( req, res ) =>
 
 const editCustomer = async ( req, res ) =>
 {
-  const id = req.params;
+  const {id} = req.params;
   const userId = res.user.id
   const { type, name, biz_name, phone_number, dispatch_location, email, address, landmark, city, state } = req.body;
 
@@ -75,18 +80,21 @@ const editCustomer = async ( req, res ) =>
 
   if ( type.toUpperCase() === "BUSINESS" && !biz_name ) return sendErrorResponse( res, 400, "Business name is required for a business type", { name, type, biz_name, phone_number } );
   try {
-    const customer = await prisma.customer.findFirstOrThrow( { where: { id, userId },include:{invoices:true} } );
-    customer.type = type.toUpperCase();
-    customer.name = name;
-    customer.biz_name = biz_name;
-    customer.phone_number = phone_number;
-    customer.dispatch_location = dispatch_location;
-    customer.email = email;
-    customer.address = address;
-    customer.landmark = landmark;
-    customer.city = city;
-    customer.state = state;
-    await prisma.customer.update( { where: { id }, data: customer } );
+    const customerDetails = await prisma.customer.findFirstOrThrow( { where: { id, userId } } );
+    customerDetails.type = type.toUpperCase();
+    customerDetails.name = name;
+    customerDetails.biz_name = biz_name;
+    customerDetails.phone_number = phone_number;
+    customerDetails.dispatch_location = dispatch_location;
+    customerDetails.email = email;
+    customerDetails.address = address;
+    customerDetails.landmark = landmark;
+    customerDetails.city = city;
+    customerDetails.state = state;
+
+    await prisma.customer.update( { where: { id }, data: customerDetails } );
+
+    const customer =  await prisma.customer.findFirstOrThrow( { where: { id, userId },include:{invoices:true} } );
     return sendSuccessResponse( res, 200, "Customer updated successfully", { customer } );
   } catch (error) {
     console.log( error );
@@ -102,7 +110,7 @@ const deleteCustomer = async ( req, res ) =>
 {
   try {
     const userId = res.user.id;
-    const id = req.params;
+    const {id} = req.params;
 
     await prisma.customer.delete( { where: { userId, id } } );
 

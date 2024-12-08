@@ -8,7 +8,8 @@ const createItem = async ( req, res ) =>
 {
   const userId = res.user.id;
   const { title, category, description, group, price, quantity, hasDiscount, discount, discountType, hasVariation, unit, isPublic, variations } = req.body;
-  const items = req.files;
+  const { items } = req.files;
+  
   try {
     
     if ( !group ) {
@@ -22,23 +23,25 @@ const createItem = async ( req, res ) =>
         await prisma.group.create( { data: { name: group, userId } } );
       }
     }
+    const variants = JSON.parse( variations )
     const item = await prisma.item.create( {
       data: {
+        userId,
         title,
         category,
         description,
         group: group || "all",
         price: parseFloat( price ),
         quantity: parseInt( quantity ),
-        hasDiscount,
+        hasDiscount:hasDiscount ==="true" ? true : false,
         discount: discount ? parseFloat( discount ) : 0,
-        discountType,
-        hasVariation,
+        discountType:discountType === '' ? null : discountType.toUpperCase(),
+        hasVariation:hasVariation ==="true" ? true : false,
         unit,
-        isPublic,
+        isPublic:isPublic ==="true" ? true : false,
         image:items.map(item=>item.path),
         variations: {
-          create: variations.map( variation => ( {
+          create: variants.map( variation => ( {
             type: variation.type.toUpperCase(),
             variant:variation.variant,
             price: parseFloat( variation.price ),
@@ -61,8 +64,6 @@ const createItem = async ( req, res ) =>
 
 const getItem = async ( req, res ) =>
 {
-  const skip = +req.query.skip || 0;
-  const TAKE_NUMBER = 10;
   const userId = res.user.id;
   try {
     const count = await prisma.item.count();
@@ -71,8 +72,6 @@ const getItem = async ( req, res ) =>
       where: {
         userId
       },
-      take: TAKE_NUMBER,
-      skip:skip,
       include: {
         variations:true
       }
@@ -100,7 +99,7 @@ const getSingleItem = async ( req, res ) =>
         variations:true
       }
     } )
-    return sendSuccessResponse(res,200,"Items Found",{items,count})
+    return sendSuccessResponse(res,200,"Items Found",{item:items})
   } catch ( error ) {
     console.log( error )
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -118,8 +117,8 @@ const deleteImage = async ( req, res ) =>
   if ( !imageIndex || !itemId ) return sendErrorResponse( res, 400, "Image index and item id is required" );
   try {
     const item = await prisma.item.findFirstOrThrow( { where: { id: itemId, userId } } );
-    const newImages = item.image.filter( img => item.image.indexOf( img ) !== imageIndex );
-    const image = item.image[ imageIndex ]
+    const newImages = item.image.filter( img => item.image.indexOf( img ) !== parseInt(imageIndex) );
+    const image = item.image[ parseInt(imageIndex) ]
     
     await prisma.item.update( {
       where: {
@@ -180,13 +179,14 @@ const editItem = async ( req, res ) =>
     item.price = price ? parseFloat( price ) : item.price;
     item.quantity = quantity ? parseInt( quantity ) : item.quantity;
     item.hasDiscount = hasDiscount || item.hasDiscount;
-    item.discount = hasDiscount ? discount : item.discount;
+    item.discount = discount ? parseInt(discount) : item.discount;
     item.discountType = hasDiscount ? discountType.toUpperCase() : item.discountType;
     item.hasVariation = hasVariation || item.hasVariation;
     item.unit = unit || item.unit;
     item.isPublic = isPublic || item.isPublic;
     await prisma.item.update( { where: { id }, data: item } );
-    return sendSuccessResponse( res, 200, "Item updated", {item});
+    const newItem = await prisma.item.findFirstOrThrow( { where: { id, userId },include:{variations:true} } );
+    return sendSuccessResponse( res, 200, "Item updated", {item:newItem});
   } catch (error) {
     console.log( error )
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -202,11 +202,11 @@ const uploadImage = async ( req, res ) =>
   const { id } = req.params;
   const userId = res.user.id;
   if ( !id ) return sendErrorResponse( res, 400, "Item Id is required" );
-  const image =  req.files
+  const { items } = req.files;
   try {
     const item = await prisma.item.findFirstOrThrow( { where: { id, userId } } );
-    if ( item.image.length + image.length > 5 ) return sendErrorResponse( res, 401, "Maximum image uploaded" );
-    const images = [ ...item.image, ...image.map( ( file ) => file.path ) ];
+    if ( item.image.length + items.length > 5 ) return sendErrorResponse( res, 401, "Maximum image uploaded" );
+    const images = [ ...item.image, ...items.map( ( file ) => file.path ) ];
     await prisma.item.update( {
       where: {
         id,
