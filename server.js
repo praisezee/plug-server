@@ -11,7 +11,7 @@ const { verifyJwt } = require( './middleware/auth' );
 const cron = require('node-cron');
 const { uploadDocs, uploadProduct } = require( "./middleware/fileStorage" );
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3500;
 
 const app = express();
