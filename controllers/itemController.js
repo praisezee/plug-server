@@ -24,35 +24,60 @@ const createItem = async ( req, res ) =>
       }
     }
     const variants = JSON.parse( variations )
-    const item = await prisma.item.create( {
-      data: {
-        userId,
-        title,
-        category,
-        description,
-        group: group || "all",
-        price: parseFloat( price ),
-        quantity: parseInt( quantity ),
-        hasDiscount:hasDiscount ==="true" ? true : false,
-        discount: discount ? parseFloat( discount ) : 0,
-        discountType:discountType === '' ? null : discountType.toUpperCase(),
-        hasVariation:hasVariation ==="true" ? true : false,
-        unit,
-        isPublic:isPublic ==="true" ? true : false,
-        image:items.map(item=>item.path),
-        variations: {
-          create: variants.map( variation => ( {
-            type: variation.type.toUpperCase(),
-            variant:variation.variant,
-            price: parseFloat( variation.price ),
-            quantity: parseInt(variation.quantity)
-          }))
+    let item; 
+    if ( !variations ) {
+      item = await prisma.item.create( {
+        data: {
+          userId,
+          title,
+          category,
+          description,
+          group: group || "all",
+          price: parseFloat( price ),
+          quantity: parseInt( quantity ),
+          hasDiscount:hasDiscount ==="true" ? true : false,
+          discount: discount ? parseFloat( discount ) : 0,
+          discountType:discountType === '' ? null : discountType.toUpperCase(),
+          hasVariation:hasVariation ==="true" ? true : false,
+          unit,
+          isPublic:isPublic ==="true" ? true : false,
+          image:items.map(item=>item.path)
+        },
+        include: {
+          variations:true
         }
-      },
-      include: {
-        variations:true
-      }
-    } )
+      } )
+    } else {
+      item = await prisma.item.create( {
+        data: {
+          userId,
+          title,
+          category,
+          description,
+          group: group || "all",
+          price: parseFloat( price ),
+          quantity: parseInt( quantity ),
+          hasDiscount:hasDiscount ==="true" ? true : false,
+          discount: discount ? parseFloat( discount ) : 0,
+          discountType:discountType === '' ? null : discountType.toUpperCase(),
+          hasVariation:hasVariation ==="true" ? true : false,
+          unit,
+          isPublic:isPublic ==="true" ? true : false,
+          image:items.map(item=>item.path),
+          variations: {
+            create: variants.map( variation => ( {
+              type: variation.type.toUpperCase(),
+              variant:variation.variant,
+              price: parseFloat( variation.price ),
+              quantity: parseInt(variation.quantity)
+            }))
+          }
+        },
+        include: {
+          variations:true
+        }
+      } )
+    }
     
     return sendSuccessResponse( res, 201, "Item Created", { item } );
 
