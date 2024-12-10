@@ -23,7 +23,6 @@ const createItem = async ( req, res ) =>
         await prisma.group.create( { data: { name: group, userId } } );
       }
     }
-    const variants = JSON.parse( variations )
     let item; 
     if ( !variations ) {
       item = await prisma.item.create( {
@@ -48,6 +47,7 @@ const createItem = async ( req, res ) =>
         }
       } )
     } else {
+      const variants = JSON.parse( variations )
       item = await prisma.item.create( {
         data: {
           userId,
