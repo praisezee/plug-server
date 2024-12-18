@@ -17,18 +17,18 @@ const createInvoice = async (req,res) =>{
         invoice_number,
         userId,
         due_date,
-        due_day,
+        due_day:parseInt(due_day),
         others,
         customerId,
         total:parseFloat(total),
         discount:parseFloat(discount),
         tax: parseFloat( tax ),
         status,
-        isFullfiled,
+        isFullfiled:isFullfiled === "true" ? true : false,
         notes,
-        signature: signature.path || null,
+        signature: signature ? signature.path: null,
         items: {
-          create: items.map( item => ( {
+          create: JSON.parse(items).map( item => ( {
             itemId: item.itemId,
             name: item.name,
             description: item.description,
@@ -59,22 +59,16 @@ const createInvoice = async (req,res) =>{
 const getInvoices = async ( req, res ) =>
 {
   const userId = res.user.id;
-  const skip = +req.query.skip || 0;
-  const TAKE_NUMBER = 10;
   try {
-    const count = await prisma.invoice.count();
-    if ( count === 0 ) return sendSuccessResponse( res, 200, "No invoice found", { invoices: [], count } );
     const invoices = await prisma.invoice.findMany( {
       where: { userId },
-      take: TAKE_NUMBER,
-      skip,
       include: {
         customer: true,
         items:true
       }
     } );
 
-    return sendSuccessResponse( res, 200, "Invoices found", { invoices, count } );
+    return sendSuccessResponse( res, 200, "Invoices found", { invoices } );
   } catch (error) {
     console.log( error )
     return sendErrorResponse( res, 500, "Internal server error", error );

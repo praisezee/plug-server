@@ -1,15 +1,17 @@
-module.exports = () =>
+const { sendSuccessResponse, sendErrorResponse } = require('./responseHelper')
+const generateInvoice = ( req, res ) =>
 {
-      const prefix = "INV";
-      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      let randomString;
+      try {
+            const prefix = "INV";
 
-      for ( let i = 0; i < 10; i++ ) {
-            const randomIndex = Math.floor( Math.random() * characters.length );
-            randomString += characters[ randomIndex ];
+            const timeStamp = Date.now().toString( 36 );
+            const invoice_number = `${ prefix }${ timeStamp }`;
+
+            sendSuccessResponse(res,201,"Invoice generated",{invoice_number:invoice_number.toLocaleUpperCase()})
+      } catch (error) {
+            sendErrorResponse(res,500,"Internal server error",{error})
       }
-
-      const timeStamp = Date.now().toString( 36 );
-      return `${ prefix }${ timeStamp }${ randomString }`;
 };
+
+module.exports = generateInvoice
 
