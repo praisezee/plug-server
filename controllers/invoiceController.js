@@ -107,30 +107,23 @@ const editInvoiceStatus = async ( req, res ) =>
   const userId = res.user.id;
   const invoiceId = req.params.id;
   if ( !invoiceId ) return sendErrorResponse( res, 400, "Invoice id is required" );
-  const { status } = req.body;
+  const { payment_status, order_status } = req.body;
 
   try {
     const invoice = await prisma.invoice.findFirstOrThrow( {
       where: {
         userId,
         id: invoiceId
-      },
-      include: {
-        customer: true,
-        items:true
       }
     } );
 
-    invoice.status = status.toUpperCase();
+    invoice.status = payment_status.toUpperCase();
+    invoice.order_status = order_status.toUpperCase();
 
     await prisma.invoice.update( {
       where: {
         userId,
         id: invoiceId
-      },
-      include: {
-        customer: true,
-        items:true
       },
       data: invoice
     })

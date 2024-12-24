@@ -27,7 +27,11 @@ const createCustomer = async ( req, res ) =>
         city,
         state
       },
-      include:{invoices:true}
+      include: {
+        invoices: {
+          include: { items: true }
+        }
+      }
     } );
     return sendSuccessResponse( res, 201, "Customer created successfully", { customer } );
   } catch ( error ) {
@@ -40,7 +44,13 @@ const getContacts = async ( req, res ) =>
 {
   try {
     const userId = res.user.id
-    const customers = await prisma.customer.findMany( { where: {userId},include:{invoices:true} } );
+    const customers = await prisma.customer.findMany( {
+      where: { userId }, include: {
+        invoices: {
+          include: { items: true }
+        }
+      }
+    } );
     return sendSuccessResponse( res, 200, "Found contact", { customers } );
   } catch (error) {
     console.log( error );
@@ -56,7 +66,8 @@ const getSingleContact = async ( req, res ) =>
     const customer = await prisma.customer.findFirstOrThrow( {
       where: { id, userId },
       include: {
-        invoices:true
+        invoices: {
+          include:{items:true}}
       }
     })
     return sendSuccessResponse( res, 200, "Found contact", { customer } );
@@ -94,7 +105,13 @@ const editCustomer = async ( req, res ) =>
 
     await prisma.customer.update( { where: { id }, data: customerDetails } );
 
-    const customer =  await prisma.customer.findFirstOrThrow( { where: { id, userId },include:{invoices:true} } );
+    const customer = await prisma.customer.findFirstOrThrow( {
+      where: { id, userId }, include: {
+        invoices: {
+          include: { items: true }
+        }
+      }
+    } );
     return sendSuccessResponse( res, 200, "Customer updated successfully", { customer } );
   } catch (error) {
     console.log( error );
