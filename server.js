@@ -48,6 +48,9 @@ app.use( '/customers', require( './routes/customer' ) );
 app.use( '/items', uploadProduct, require( "./routes/item" ) );
 app.use( '/invoice',uploadSig, require( "./routes/invoice" ) );
 app.use( '/variation', require( "./routes/variation" ) );
+app.use( '/account', require( "./routes/account" ) );
+app.use( "/transactions", require( "./routes/tansaction" ) );
+app.use( "/bills", require( "./routes/bills" ) );
 
 
 

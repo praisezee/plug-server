@@ -60,6 +60,11 @@ enum OrderStatus{
   RETURNED
 }
 
+enum PaymentMethod{
+  DEPOSIT
+  CHECKOUT
+}
+
 
 model User{
   id String @unique @default(uuid())
@@ -76,6 +81,9 @@ model User{
   isVerified Boolean @default(false)
   isApproved Boolean @default(false)
   description String?
+  isDefaultPin Boolean @default(true)
+  pin String?
+  account_id Int @unique @default(autoincrement())
   refresh_token String[]
   reset_password_token String?
   created_at DateTime @default(now())
@@ -258,6 +266,7 @@ model Invoice {
   isFullfiled Boolean @default(false)
   note String?
   signature String?
+  payment_method PaymentMethod?
   order_status OrderStatus @default(PENDING)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

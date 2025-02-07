@@ -1,6 +1,7 @@
 const { PrismaClient,Prisma } = require( '@prisma/client' );
 const jwt = require( "jsonwebtoken" );
 const { sendSuccessResponse, sendErrorResponse } = require( '../utils/responseHelper' );
+const { getMainAccount, getSettlementAccount, getNubanAccount } = require( '../utils/accouthelp' );
 
 const prisma = new PrismaClient();
 
@@ -10,6 +11,7 @@ const refresh = async ( req, res ) =>
             const cookies = req.cookies;
             if ( !cookies?.refreshToken ) return res.sendStatus( 401 );
             const oldRefresh = cookies.refreshToken;
+            let mainAccount,settlementAccount,nubanAccount,user;
 
             const foundUser = await prisma.user.findFirstOrThrow( {
                   where: {
@@ -46,14 +48,23 @@ const refresh = async ( req, res ) =>
                   
                   await prisma.user.update( { where: { email: foundUser.email }, data: foundUser } )
 
-                  
+                  user = { ...foundUser, accessToken }
+                  /**
+     * @dev This block checks to see if the users is approved and the wallet account has been created. Replace the number 3 to foundUser.account_id
+     */
+                  if ( foundUser.isApproved ) {
+                        mainAccount = await getMainAccount( /*foundUser.account_id ||*/ 3 );
+                        settlementAccount = await getSettlementAccount( /*foundUser.account_id ||*/ 3 );
+                        nubanAccount = await getNubanAccount( /*foundUser.account_id ||*/ 3)
+                        user = { ...user, mainAccount, settlementAccount, nubanAccount };
+                  }
                   res.cookie( 'refreshToken', refreshToken, {
                   httpOnly: true,
                   maxAge: 30 * 24 * 60 * 60 * 1000,
                   sameSite:"None",
                   secure: true
                   } )
-                  const user = { ...foundUser, accessToken };
+                  
                   delete user.password;
                   delete user.refresh_token
                   delete user.reset_password_token;

@@ -6,6 +6,7 @@ const { sendErrorResponse, sendSuccessResponse } = require( "../utils/responseHe
 const { sanitizeSubdomain } = require( "../utils/sanitizedomain" );
 const { sendMail } = require( "../utils/mailHelper" );
 const loadTemplate = require( "../utils/htmlLoader" );
+const { getMainAccount, getSettlementAccount, getNubanAccount } = require( "../utils/accouthelp" );
 
 const prisma = new PrismaClient();
 
@@ -63,6 +64,7 @@ const loginUser = async ( req, res ) =>
   try {
     const foundUser = await prisma.user.findUniqueOrThrow( { where: { email } } );
     const validatePassword = await argon.verify( foundUser.password, password );
+    let mainAccount,settlementAccount,nubanAccount,user;
 
     if ( !validatePassword ) return res.status( 401 ).json( { message: "Invalid credentials" } );
 
@@ -95,7 +97,18 @@ const loginUser = async ( req, res ) =>
         refresh_token: [ refreshToken, ...foundUser.refresh_token ]
       }
     } );
-    const user = { ...foundUser, accessToken }
+    
+    user = { ...foundUser, accessToken }
+    /**
+     * @dev This block checks to see if the users is approved and the wallet account has been created. Replace the number 3 to foundUser.account_id
+     */
+    if ( foundUser.isApproved ) {
+      mainAccount = await getMainAccount( /*foundUser.account_id ||*/ 3 );
+      settlementAccount = await getSettlementAccount( /*foundUser.account_id ||*/ 3 );
+      nubanAccount = await getNubanAccount( /*foundUser.account_id ||*/ 3)
+      user = { ...user, mainAccount, settlementAccount, nubanAccount };
+    }
+
     delete user.password;
     delete user.otp;
     delete user.refresh_token;
@@ -115,7 +128,6 @@ const loginUser = async ( req, res ) =>
       if (error.code === "P2025")
       return sendErrorResponse(res,404,"User does not exist")
     }
-    console.log( error )
     return sendErrorResponse( res, 500, "Internal server error", error );
   }
 }

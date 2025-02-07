@@ -6,7 +6,7 @@
   "author": "Apus Industries Limited",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon server",
+    "dev": "prisma db push && nodemon server",
     "start": "prisma db push --accept-data-loss && pm2 start server.js --name Plug && pm2 log Plug",
     "db-update": "prisma db push"
   },

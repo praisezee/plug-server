@@ -8,5 +8,10 @@ const axios = axiosInstance.create( {
       headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
+            'X-Pepsa-Wallet':"12$zJszMDDPi8pzRznn48AaLuYESHdlioaN1Z1U4DoN7dpL3ODn3gmbS"
       },
-})
+} )
+
+
+module.exports = axios;
+
