@@ -10,12 +10,13 @@ const prisma = new PrismaClient();
 
 const getTransactions = async ( req, res ) =>
 {
-  const { account_id } = req.query;
+  const { account_id,page_no } = req.query;
   if ( !account_id ) return sendErrorResponse( res, 400, "User account Id is required" );
   try {
     const response = await axios.post( "/account/deposit/transaction", {
       user_id: account_id,
       user_type: "PLUG",
+      pagination_num:page_no || null,
       get_all: true
     } );
     const result = await response.data
