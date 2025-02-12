@@ -65,7 +65,7 @@ const personalKyc = async ( req, res ) =>
 {
   const { firstname, lastname, gender, dob, phone_number, address, city, state, biz_address, biz_city, biz_state, id_type, id_number, id_exp, bvn,email } = req.body
   const { proof_id,proof_address,others,principal_image } = req.files;
-  if ( !firstname || !lastname || !gender || !dob || !phone_number || !address || !city || !state || !biz_address || !biz_city || !biz_state || !id_type || !id_number || !id_exp || !bvn || !proof_id || !proof_address || !email || !principal_image ) return sendErrorResponse( res, 400, "Please fill all fields" );
+  if ( !firstname || !lastname || !gender || !dob || !phone_number || !address || !city || !state || !biz_address || !biz_city || !biz_state || !id_type || !id_number || !id_exp || !bvn || !proof_id || !proof_address || !email || !principal_image ) return sendErrorResponse( res, 400, "Please fill all fields", {firstname, lastname, gender, dob, phone_number, address, city, state, biz_address, biz_city, biz_state, id_type, id_number, id_exp, bvn,email,proof_id,proof_address,principal_image} );
   try {
     const user = await prisma.user.findUniqueOrThrow( { where: { email } } );
 
