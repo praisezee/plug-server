@@ -83,7 +83,7 @@ model User{
   description String?
   isDefaultPin Boolean @default(true)
   pin String?
-  account_id Int @unique @default(3)
+  account_id Int @default(3)
   refresh_token String[]
   reset_password_token String?
   created_at DateTime @default(now())
