@@ -114,6 +114,7 @@ const loginUser = async ( req, res ) =>
     delete user.refresh_token;
     delete user.reset_password_token;
     delete user.terms;
+    delete user.pin
 
     res.cookie( "refreshToken", refreshToken, {
       httpOnly: true,

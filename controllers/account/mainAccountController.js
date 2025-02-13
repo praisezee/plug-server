@@ -125,4 +125,31 @@ const interBankTransfer = async(req,res) =>
   }
 }
 
-module.exports = { getTransactions, getSingleTransaction, fetchUserDetails, bookTransfer, interBankTransfer };
+const setPin = async (req,res) =>{
+  const {pin} = req.body;
+  if(!pin) return sendErrorResponse(res,400,"User pin is required",{pin})
+    try {
+      const userId = res.user.id;
+      const user = await prisma.user.findUniqueOrThrow( { where: { id: userId } } );
+      const userPin = await argon.hash( pin )
+      user.pin = userPin
+
+      await prisma.user.update( {
+        where: { id: userId }, data: {
+          pin: userPin,
+          isDefaultPin:false
+        }
+      } )
+      
+      return sendSuccessResponse(res,200,"Pin has been set")
+    } catch (error) {
+      console.error( error );
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if ( error.code === "P2025" )
+        return sendErrorResponse( res, 404, "User does not exist" );
+    }
+    return sendErrorResponse( res, 500, "Internal server error", error );
+    }
+}
+
+module.exports = { getTransactions, getSingleTransaction, fetchUserDetails, bookTransfer, interBankTransfer,setPin };

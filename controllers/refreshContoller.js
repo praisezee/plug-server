@@ -68,6 +68,7 @@ const refresh = async ( req, res ) =>
                   delete user.password;
                   delete user.refresh_token
                   delete user.reset_password_token;
+                  delete user.pin
                   delete user.otp;
 
                   return sendSuccessResponse(res,200,"Authenticated",{user})
