@@ -98,3 +98,5 @@ cron.schedule( '* * * * *', async () =>
     console.error( 'Error processing OTP expiration:', error );
   }
 } );
+
+module.exports = app
