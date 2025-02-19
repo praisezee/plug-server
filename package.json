@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "prisma db push && nodemon server",
     "start": "prisma db push --accept-data-loss && pm2 start server.js --name Plug && pm2 log Plug",
+    "postinstall": "prisma generate && prisma db push --accept-data-loss",
     "db-update": "prisma db push"
   },
   "dependencies": {
