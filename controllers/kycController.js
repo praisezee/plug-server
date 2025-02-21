@@ -11,9 +11,7 @@ const businessKyc = async ( req, res ) =>
   if ( !name || !reg_type || !reg_date || !industry || !reg_address | !biz_address || !biz_city || !biz_state || !reg_city || !reg_state || !reg_number || !tax_number || !id_type || !email || !proof_address || !proof_id || !biz_cert || !mermat || !status || !principal_image || directors.length<1 ) return sendErrorResponse( res, 400, "Please fill all required fields" );
   try {
     const user = await prisma.user.findUniqueOrThrow( { where: { email } } );
-    console.log(directors)
-    const newDirectors = JSON.parse( directors )
-    console.log(newDirectors)
+    console.log(directors[0])
     await prisma.businessKyc.create( {
       data: {
         userId: user.id,
@@ -38,7 +36,7 @@ const businessKyc = async ( req, res ) =>
         proof_address: proof_address[ 0 ].path,
         other_docs: others.map( item => item.path ),
         directors: {
-          create: newDirectors.map( director => ( {
+          create: directors.map( director => ( {
             firstname: director.firstname,
             lastname: director.lastname,
             gender: director.gender.toUpperCase(),
