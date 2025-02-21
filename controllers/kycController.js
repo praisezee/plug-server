@@ -35,7 +35,7 @@ const businessKyc = async ( req, res ) =>
         proof_address: proof_address[ 0 ].path,
         other_docs: others.map( item => item.path ),
         directors: {
-          create: directors.map( director => ( {
+          create: JSON.parse(directors.map( director => ( {
             firstname: director.firstname,
             lastname: director.lastname,
             gender: director.gender.toUpperCase(),
@@ -45,7 +45,7 @@ const businessKyc = async ( req, res ) =>
             city: director.city,
             owner_share: parseInt( director.share ),
             role:director.role
-          }))
+          })))
         }
       }
     } )
