@@ -44,7 +44,7 @@ const businessKyc = async ( req, res ) =>
             address: director.address,
             state: director.state,
             city: director.city,
-            owner_share: parseInt( director.share ),
+            owner_share: parseInt( director.owner_share ),
             role:director.role
           }))
         }
