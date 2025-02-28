@@ -5,6 +5,7 @@ const settlementAccount = require( "../controllers/account/settlementAccountCont
 router.post("/",mainAccount.setPin)
 router.get( '/deposit', mainAccount.fetchUserDetails );
 router.post( "/deposit/book-transfer", mainAccount.bookTransfer );
+router.post( "/deposit/save-counterparty", mainAccount.saveCounterParty );
 router.post( "/deposit/interbank-transfer", mainAccount.interBankTransfer );
 router.post( "/settlement/withdraw", settlementAccount.processPayout );
 

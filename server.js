@@ -9,7 +9,7 @@ const credentials = require( "./middleware/credentials" );
 const corsOption = require( "./config/corsOption" );
 const { verifyJwt } = require( './middleware/auth' );
 const cron = require('node-cron');
-const { uploadDocs, uploadProduct, uploadSig } = require( "./middleware/fileStorage" );
+const { uploadDocs, uploadProduct, uploadSig, uploadProfile } = require( "./middleware/fileStorage" );
 
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3500;
@@ -50,6 +50,7 @@ app.use( '/invoice',uploadSig, require( "./routes/invoice" ) );
 app.use( '/variation', require( "./routes/variation" ) );
 app.use( '/account', require( "./routes/account" ) );
 app.use( "/transactions", require( "./routes/tansaction" ) );
+app.use( "/profile", uploadProfile, require( "./routes/profile" ) );
 app.use( "/bills", require( "./routes/bills" ) );
 
 

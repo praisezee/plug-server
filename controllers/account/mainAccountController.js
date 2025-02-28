@@ -99,9 +99,9 @@ const bookTransfer = async ( req, res ) =>
   }
 }
 
-const interBankTransfer = async(req,res) =>
+const saveCounterParty = async(req,res) =>
 {
-  const { account_id, accountNumber, accountName, bank, amount, pin,narration } = req.body;
+  const { account_id, accountNumber, accountName, bank, amount, pin } = req.body;
   if ( !account_id || !accountNumber || !accountName || !bank || !amount || !pin ) return sendErrorResponse( res, 400, "Enter all necessary field", { account_id, accountNumber, accountName, bank, amount, pin } );
   const userId = res.user.id
   try {
@@ -112,7 +112,31 @@ const interBankTransfer = async(req,res) =>
 
     const data = await saveCounterpartyMain( account_id, accountNumber, accountName, bank, amount );
 
-    const process = await processTransactionMain( account_id, data.r_wallet_id, narration, amount, data.r_bank_code, accountName, accountNumber );
+    return sendSuccessResponse( res, 200, "Transaction successful", { acc_info: data } );
+  } catch (error) {
+    console.error( error );
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if ( error.code === "P2025" )
+        return sendErrorResponse( res, 404, "User does not exist" );
+    }
+    return sendErrorResponse( res, 500, "Internal server error", error );
+  }
+}
+
+
+const interBankTransfer = async ( req, res ) =>
+{
+  const { account_id, wallet_id, narration, amount, bank_code, accountName, accountNumber } = req.body;
+  
+  if( !account_id || !wallet_id || !narration || !amount || !bank_code || !accountName || !accountNumber)return sendErrorResponse( res, 400, "Enter all necessary field", { account_id, wallet_id, narration, amount, bank_code, accountName, accountNumber } );
+
+  try {
+    const user = await prisma.user.findUniqueOrThrow( { where: { id: userId } } );
+
+    const validatePin = await argon.verify( user.pin, pin );
+    if ( !validatePin ) return sendErrorResponse( res, 401, "Invalid transaction pin" );
+
+    const process = await processTransactionMain( account_id, wallet_id, narration, amount, bank_code, accountName, accountNumber );
 
     return sendSuccessResponse( res, 200, "Transaction successful", { transaction: process } );
   } catch (error) {
@@ -123,6 +147,8 @@ const interBankTransfer = async(req,res) =>
     }
     return sendErrorResponse( res, 500, "Internal server error", error );
   }
+
+
 }
 
 const setPin = async (req,res) =>{
@@ -152,4 +178,4 @@ const setPin = async (req,res) =>{
     }
 }
 
-module.exports = { getTransactions, getSingleTransaction, fetchUserDetails, bookTransfer, interBankTransfer,setPin };
+module.exports = { getTransactions, getSingleTransaction, fetchUserDetails, bookTransfer, interBankTransfer,setPin,saveCounterParty };
