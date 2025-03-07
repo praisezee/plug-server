@@ -52,6 +52,7 @@ app.use( '/account', require( "./routes/account" ) );
 app.use( "/transactions", require( "./routes/tansaction" ) );
 app.use( "/profile", uploadProfile, require( "./routes/profile" ) );
 app.use( "/bills", require( "./routes/bills" ) );
+app.use( "/orders", require( "./routes/order" ) );
 
 
 
@@ -99,5 +100,3 @@ cron.schedule( '* * * * *', async () =>
     console.error( 'Error processing OTP expiration:', error );
   }
 } );
-
-module.exports = app;

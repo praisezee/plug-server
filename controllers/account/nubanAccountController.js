@@ -1,4 +1,4 @@
-const axios = require( '../../utils/axios' );
+const {axios} = require( '../../utils/axios' );
 const { sendErrorResponse, sendSuccessResponse } = require( '../../utils/responseHelper' );
 
 const getTransactions = async ( req, res ) =>

@@ -1,5 +1,5 @@
 const { generateRefrence, saveCounterpartyMain, processTransactionMain } = require( '../../utils/accouthelp' );
-const axios = require( '../../utils/axios' );
+const {axios} = require( '../../utils/axios' );
 const { sendErrorResponse, sendSuccessResponse } = require( '../../utils/responseHelper' );
 const { PrismaClient, Prisma } = require( "@prisma/client" );
 const argon = require( "argon2" );
