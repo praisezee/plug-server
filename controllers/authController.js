@@ -102,7 +102,7 @@ const loginUser = async ( req, res ) =>
     /**
      * @dev This block checks to see if the users is approved and the wallet account has been created. Replace the number 3 to foundUser.account_id
      */
-    if ( foundUser.isApproved || foundUser.account_id ) {
+    if ( foundUser.isApproved && foundUser.account_id ) {
       mainAccount = await getMainAccount( /*foundUser.account_id ||*/ 3 );
       settlementAccount = await getSettlementAccount( /*foundUser.account_id ||*/ 3 );
       nubanAccount = await getNubanAccount( /*foundUser.account_id ||*/ 3)
@@ -125,6 +125,7 @@ const loginUser = async ( req, res ) =>
     
     return sendSuccessResponse( res, 200, "Login was successful", { user } );
   } catch (error) {
+    console.error(error);
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2025")
       return sendErrorResponse(res,404,"User does not exist")
