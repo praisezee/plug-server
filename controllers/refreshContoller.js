@@ -52,7 +52,7 @@ const refresh = async ( req, res ) =>
                   /**
      * @dev This block checks to see if the users is approved and the wallet account has been created. Replace the number 3 to foundUser.account_id
      */
-                  if ( foundUser.isApproved || foundUser.account_id ) {
+                  if ( foundUser.isApproved && foundUser.account_id ) {
                         mainAccount = await getMainAccount( /*foundUser.account_id ||*/ 3 );
                         settlementAccount = await getSettlementAccount( /*foundUser.account_id ||*/ 3 );
                         nubanAccount = await getNubanAccount( /*foundUser.account_id ||*/ 3)

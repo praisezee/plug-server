@@ -12,7 +12,7 @@ const createOrder = async ( req, res ) =>
   try {
     const user = await prisma.user.findUniqueOrThrow( { where: { id: userId } } );
     const data = {
-      user_id: user.id,
+      user_id: user.account_id,
       user_type: "PLUG",
       sender_name: user.name,
       sender_phone: user.phone_number,
@@ -96,6 +96,18 @@ const mobilityCost = async ( req, res ) =>
   }
 };
 
+const confirmPickupToken = async ( req, res ) =>
+{
+  const { confirm_token, order_no } = req.body;
+  try {
+    const response = await dispatchAxios.post( "/order/token-confirmation", { confirm_token, order_no } );
+    const result = await response.data;
+    return sendSuccessResponse( res, 200, "Delivery Cost", { confirm: result } );
+  } catch (error) {
+    return sendErrorResponse(res,500,"Internal Server Error",{error})
+  }
+}
 
 
-module.exports={mobilityCost,createOrder,vehicleType}
+
+module.exports={mobilityCost,createOrder,vehicleType,confirmPickupToken}
